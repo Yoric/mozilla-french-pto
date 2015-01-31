@@ -1,0 +1,9 @@
+[submodule "lib/requirejs"]
+	path = lib/requirejs
+	url = http://github.com/jrburke/requirejs
+[submodule "lib/react"]
+	path = lib/react
+	url = https://github.com/facebook/react
+[submodule "lib/jsx-requirejs-plugin"]
+	path = lib/jsx-requirejs-plugin
+	url = https://github.com/philix/jsx-requirejs-plugin
