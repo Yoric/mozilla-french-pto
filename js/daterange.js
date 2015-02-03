@@ -3,23 +3,74 @@
 
 var DateRange = React.createClass({
   displayName: "DateRange",
+  statics: {
+    fields: {
+      jn: {
+        label: "Journée normale"
+      },
+      cp: {
+        label: "Congés payés"
+      },
+      css: {
+        label: "Congés sans soldes"
+      },
+      jf: {
+        label: "Jour férié"
+      },
+      rtt: {
+        label: "RTT"
+      },
+      av: {
+        label: "Anniversaire"
+      },
+      am: {
+        label: "Arrêt Maladie"
+      }
+    }
+  },
   render: function() {
+    var readOnly = !!(this.props.data && this.props.data.readOnly);
+    var startDate = (this.props.data && this.props.data.startDate) || new Date();
+    var endDate = (this.props.data && this.props.data.endDate) || new Date();
     return (
       <div className="dateRange">
-      <input className="datePicker"
-        type="date"
-        defaultValue={new Date()}
-        data-format="'Starts on' yyyy-MM-dd"></input>
-      <input className="datePicker"
-        type="date"
-        defaultValue={new Date()}
-        data-format="'Ends on' yyyy-MM-dd"/>
-      <input name={this.props.data.id} defaultChecked="true" type="radio">Congés payés</input>
-      <input name={this.props.data.id} type="radio">Congés sans solde</input>
-      <input name={this.props.data.id} type="radio">Jour férié</input>
-      <input name={this.props.data.id} type="radio">RTT</input>
-      <input name={this.props.data.id} type="radio">Anniversaire</input>
-      <input name={this.props.data.id} type="radio">Arrêt maladie</input>
+      {
+        readOnly
+          ?<span className="dateLabel">Starts on {startDate.toDateString()}</span>
+          :<input className="datePicker"
+            type="date"
+            defaultValue={new Date()}
+            data-format="'Starts on' yyyy-MM-dd"></input>
+      }
+      {
+        readOnly
+          ?<span className="dateLabel">Ends on {endDate.toDateString()}</span>
+          :<input className="datePicker"
+            type="date"
+            defaultValue={new Date()}
+            data-format="'Ends on' yyyy-MM-dd"></input>
+      }
+      {
+        Object.keys(DateRange.fields).map(function(k, i) {
+          var attributes;
+          console.log("Updating field", k, this.props.data);
+          var checked = this.props.data && this.props.data.kind == k;
+          if (readOnly) {
+            attributes = {
+              readOnly,
+              checked
+            }
+          } else {
+            attributes = {
+              readOnly,
+              defaultChecked: checked
+            }
+          }
+          return <input key={i} name={this.props.data.id} type="radio" {...attributes}>{
+              DateRange.fields[k].label
+            }</input>
+        }.bind(this))
+      }
       </div>
     );
   }
@@ -51,23 +102,29 @@ var RangeList = React.createClass({
     this.setState(this.state);
   },
   render: function() {
+    console.log("RangeList.render", this.props);
     var self = this;
+    var readOnly = !!(this.props.data && this.props.data.readOnly);
     return (
       <div>
       {
-        this.state.ranges.map(function (range) {
-          var id = range.id;
+        this.state.ranges.map(function (data) {
+          var options = {
+            id: data.id,
+            readOnly: readOnly,
+            kind: self.props.data && self.props.data.kind,
+          }
           return (
-            <div key={id}>
-            <DateRange data={range}/>
-            <input type="button" readOnly="true" value="Remove" onClick={
-              function() { self.handleRemove(id) }
+            <div key={data.id}>
+            <DateRange data={options}/>
+            <input disabled={readOnly} type="button" readOnly="true" value="Remove" onClick={
+              function() { self.handleRemove(options.id) }
               }/>
             </div>
           );
         })
       }
-      <input type="button" value="Add" readOnly="true" onClick={this.handleAdd}/>
+      <input disabled={readOnly} type="button" value="Add" readOnly="true" onClick={this.handleAdd}/>;
       </div>
     );
   }
