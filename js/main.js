@@ -15,4 +15,9 @@ React.render(
   document.getElementById("ranges-ro")
 );
 
+React.render(
+  <Weeks data={{startDate: new Date(), endDate: new Date(Date.now() + 17 * 24 * 3600 * 1000) }}/>,
+  document.getElementById("weeks")
+);
+
 })(React, this);
